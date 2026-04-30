@@ -1,0 +1,13 @@
+{
+  "build": {
+    "commands": [
+      "cd backend && npm install",
+      "cd frontend && npm install && npm run build"
+    ]
+  },
+  "deploy": {
+    "commands": [
+      "cd backend && npm start"
+    ]
+  }
+}
