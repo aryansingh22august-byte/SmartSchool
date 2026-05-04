@@ -135,3 +135,13 @@ CREATE TABLE IF NOT EXISTS transfer_certificates (
   issued_date DATE NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS contact_requests (
+  id TEXT PRIMARY KEY,
+  full_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  school_name TEXT NOT NULL,
+  role TEXT NOT NULL,
+  message TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);

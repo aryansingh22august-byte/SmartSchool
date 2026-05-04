@@ -1,3 +1,4 @@
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -16,6 +17,7 @@ import tcRouter from './src/routes/tc.js';
 import profileRouter from './src/routes/profile.js';
 import rolesRouter from './src/routes/roles.js';
 import usersRouter from './src/routes/users.js';
+import contactRouter from './src/routes/contact.js';
 import { initDb } from './src/db.js';
 
 dotenv.config();
@@ -25,6 +27,11 @@ const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
+const frontendDist = path.resolve(process.cwd(), '../frontend/dist');
+if (process.env.NODE_ENV === 'production' || process.env.SERVE_FRONTEND === 'true') {
+  app.use(express.static(frontendDist));
+}
 
 async function start() {
   await initDb();
@@ -44,9 +51,17 @@ async function start() {
   app.use('/api/profile', profileRouter);
   app.use('/api/roles', rolesRouter);
   app.use('/api/users', usersRouter);
+  app.use('/api/contact', contactRouter);
 
   app.get('/', (req, res) => {
     res.send({ status: 'Smart School ERP backend is running' });
+  });
+
+  app.get('*', (req, res) => {
+    if (process.env.NODE_ENV === 'production' || process.env.SERVE_FRONTEND === 'true') {
+      return res.sendFile(path.join(frontendDist, 'index.html'));
+    }
+    res.status(404).json({ message: 'Route not found' });
   });
 
   app.listen(port, () => {

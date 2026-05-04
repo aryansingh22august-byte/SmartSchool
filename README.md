@@ -34,4 +34,21 @@ The application now supports separate role definitions and authorization.
 
 ## Notes
 
-This scaffold is built for a Railway hosting flow, with CI via GitHub Actions.
+This scaffold is built for a Railway hosting flow, with the backend serving the built frontend from `frontend/dist`.
+
+## Deployment
+
+### Railway (recommended)
+1. Push the repository to GitHub.
+2. Create a new Railway project and connect your GitHub repository.
+3. Set the environment variables in Railway:
+   - `DATABASE_URL`
+   - `JWT_SECRET`
+4. Railway will run the root `railway.json` build commands:
+   - `cd backend && npm install`
+   - `cd frontend && npm install && npm run build`
+5. Railway deploys using:
+   - `cd backend && npm start`
+
+### Alternative
+- Use Vercel or Netlify for the frontend and Railway or another host for the backend API.

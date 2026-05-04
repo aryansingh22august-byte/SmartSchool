@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../api';
 
 function LoginPage() {
@@ -64,6 +64,11 @@ function LoginPage() {
 
         <p className="mt-6 text-sm text-slate-500">
           Use <span className="font-semibold">admin / admin</span> to access the system.
+        </p>
+        <p className="mt-4 text-sm text-slate-500">
+          <Link to="/" className="font-semibold text-slate-900 hover:underline">
+            Back to home
+          </Link>
         </p>
       </div>
     </div>

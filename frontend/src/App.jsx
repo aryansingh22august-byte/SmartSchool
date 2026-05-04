@@ -1,5 +1,13 @@
 import { Route, Routes, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
+import LandingPage from './pages/LandingPage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import PricingPage from './pages/PricingPage';
+import FAQPage from './pages/FAQPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsPage from './pages/TermsPage';
+import PublicLayout from './components/PublicLayout';
 import Layout from './components/Layout';
 import DashboardPage from './pages/DashboardPage';
 import AdmissionsPage from './pages/AdmissionsPage';
@@ -22,18 +30,18 @@ import RoleRoute from './components/RoleRoute';
 function App() {
   const token = localStorage.getItem('school_erp_token');
 
-  if (!token) {
-    return (
-      <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    );
-  }
-
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/login" element={token ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+      <Route element={<PublicLayout />}>
+        <Route index element={<LandingPage />} />
+        <Route path="about" element={<AboutPage />} />
+        <Route path="pricing" element={<PricingPage />} />
+        <Route path="faq" element={<FAQPage />} />
+        <Route path="contact" element={<ContactPage />} />
+        <Route path="privacy" element={<PrivacyPolicyPage />} />
+        <Route path="terms" element={<TermsPage />} />
+      </Route>
       <Route path="/" element={<Layout />}>
         <Route path="dashboard" element={<RoleRoute allowedRoles={['super-admin', 'admin', 'teacher', 'student', 'parent']}><DashboardPage /></RoleRoute>} />
         <Route path="admissions" element={<RoleRoute allowedRoles={['super-admin', 'admin']}><AdmissionsPage /></RoleRoute>} />
@@ -52,6 +60,7 @@ function App() {
         <Route path="unauthorized" element={<UnauthorizedPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
