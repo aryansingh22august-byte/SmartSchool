@@ -29,7 +29,7 @@ function LoginPage() {
     <div className="flex min-h-screen items-center justify-center px-4 py-12 bg-slate-50">
       <div className="w-full max-w-md rounded-3xl bg-white p-10 shadow-xl shadow-slate-200">
         <h1 className="mb-2 text-3xl font-semibold text-slate-900">Smart School ERP</h1>
-        <p className="mb-8 text-slate-500">Sign in to manage admissions, fees, attendance, and more.</p>
+        <p className="mb-8 text-slate-500">Sign in with your school credentials provided by Smart School.</p>
 
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>

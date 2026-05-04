@@ -40,7 +40,7 @@ function AboutPage() {
           <h2 className="text-2xl font-semibold text-slate-900">Ready to connect with your school community?</h2>
           <p className="mt-4 text-slate-600">Create a single platform for teachers, students, parents, and staff to collaborate, track progress, and stay informed.</p>
           <Link to="/contact" className="mt-8 inline-flex rounded-2xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-700">
-            Contact our team
+            Request Access
           </Link>
         </div>
       </div>

@@ -28,6 +28,7 @@ export const ROLE_DEFINITIONS = {
 
 export const NAV_ITEMS = [
   { path: '/dashboard', label: 'Dashboard', roles: ['super-admin', 'admin', 'teacher', 'student', 'parent'] },
+  { path: '/schools', label: 'School Accounts', roles: ['super-admin'] },
   { path: '/admissions', label: 'Admissions', roles: ['super-admin', 'admin'] },
   { path: '/fees', label: 'Fees', roles: ['super-admin', 'admin'] },
   { path: '/timetable', label: 'Timetable', roles: ['super-admin', 'admin', 'teacher', 'student', 'parent'] },

@@ -18,6 +18,7 @@ import profileRouter from './src/routes/profile.js';
 import rolesRouter from './src/routes/roles.js';
 import usersRouter from './src/routes/users.js';
 import contactRouter from './src/routes/contact.js';
+import schoolsRouter from './src/routes/schools.js';
 import { initDb } from './src/db.js';
 
 dotenv.config();
@@ -52,6 +53,7 @@ async function start() {
   app.use('/api/roles', rolesRouter);
   app.use('/api/users', usersRouter);
   app.use('/api/contact', contactRouter);
+  app.use('/api/schools', schoolsRouter);
 
   app.get('/', (req, res) => {
     res.send({ status: 'Smart School ERP backend is running' });

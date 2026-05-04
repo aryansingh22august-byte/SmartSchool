@@ -47,10 +47,10 @@ function LandingPage() {
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
               <Link
-                to="/login"
+                to="/contact"
                 className="inline-flex items-center justify-center rounded-2xl bg-sky-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-sky-400"
               >
-                Request a Demo
+                Request Access
               </Link>
               <a href="#features" className="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20">
                 Explore Features
@@ -60,9 +60,9 @@ function LandingPage() {
 
           <div className="w-full max-w-md rounded-[32px] border border-white/10 bg-white/95 p-8 shadow-2xl shadow-slate-900/10 backdrop-blur sm:p-10">
             <div className="mb-6">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">Connect with Smart School</p>
-              <h2 className="mt-3 text-2xl font-semibold text-slate-900">Start your onboarding request</h2>
-              <p className="mt-2 text-sm text-slate-600">Fill your details and our team will contact you with pricing and setup help.</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">Get Started</p>
+              <h2 className="mt-3 text-2xl font-semibold text-slate-900">Request school access</h2>
+              <p className="mt-2 text-sm text-slate-600">Submit your school details and we'll set up your account with login credentials.</p>
             </div>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
