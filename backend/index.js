@@ -29,7 +29,10 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const frontendDist = path.resolve(process.cwd(), '../frontend/dist');
+const frontendDist = process.env.NODE_ENV === 'production' 
+  ? path.join(process.cwd(), '../frontend/dist')
+  : path.resolve(process.cwd(), '../frontend/dist');
+
 if (process.env.NODE_ENV === 'production' || process.env.SERVE_FRONTEND === 'true') {
   app.use(express.static(frontendDist));
 }

@@ -1,0 +1,13 @@
+{
+  "name": "smart-school",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Smart School ERP System",
+  "scripts": {
+    "build": "cd backend && npm install && cd ../frontend && npm install && npm run build",
+    "start": "cd backend && npm start"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
