@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import api from '../api';
 
 function UsersPage() {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const schoolId = searchParams.get('schoolId');
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [newUser, setNewUser] = useState({ username: '', password: '', name: '', email: '', role: 'teacher' });
@@ -13,7 +17,8 @@ function UsersPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [usersResponse, rolesResponse] = await Promise.all([api.get('/users'), api.get('/roles')]);
+        const userPath = schoolId ? `/users?schoolId=${schoolId}` : '/users';
+        const [usersResponse, rolesResponse] = await Promise.all([api.get(userPath), api.get('/roles')]);
         setUsers(usersResponse.data.users);
         setRoles(rolesResponse.data.roles);
 
@@ -26,7 +31,7 @@ function UsersPage() {
     }
 
     loadData();
-  }, []);
+  }, [schoolId]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -44,7 +49,9 @@ function UsersPage() {
     setSuccess('');
 
     try {
-      const response = await api.post('/users', newUser);
+      const payload = { ...newUser };
+      if (schoolId) payload.school_id = schoolId;
+      const response = await api.post('/users', payload);
       setUsers((prev) => [...prev, response.data.user]);
       setSuccess('User created successfully.');
       setNewUser({ username: '', password: '', name: '', email: '', role: newUser.role });
@@ -105,6 +112,7 @@ function UsersPage() {
           <div>
             <h2 className="text-2xl font-semibold text-slate-900">User Administration</h2>
             <p className="mt-2 text-sm text-slate-500">Create users, edit roles, and manage access for the school.</p>
+            {schoolId && <p className="mt-2 text-sm font-medium text-slate-600">Showing users for school ID: {schoolId}</p>}
           </div>
         </div>
       </div>

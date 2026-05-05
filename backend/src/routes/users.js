@@ -29,9 +29,25 @@ router.get('/', authorizeRole('super-admin', 'admin'), async (req, res) => {
     return res.json({ users });
   }
 
+  const { schoolId } = req.query;
+  const filters = [];
+  const values = [];
+  let index = 1;
+
+  if (req.user.role !== 'super-admin') {
+    filters.push(`u.school_id = $${index++}`);
+    values.push(req.user.school_id);
+  }
+
+  if (schoolId) {
+    filters.push(`u.school_id = $${index++}`);
+    values.push(schoolId);
+  }
+
+  const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
   const result = await query(
-    `SELECT u.id, u.username, u.name, u.email, u.role, r.name AS role_name, r.permissions FROM users u LEFT JOIN roles r ON u.role = r.id ORDER BY u.username`,
-    []
+    `SELECT u.id, u.username, u.name, u.email, u.role, u.school_id, r.name AS role_name, r.permissions FROM users u LEFT JOIN roles r ON u.role = r.id ${whereClause} ORDER BY u.username`,
+    values
   );
   res.json({ users: result.rows });
 });

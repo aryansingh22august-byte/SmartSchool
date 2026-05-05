@@ -24,6 +24,7 @@ import ProfilePage from './pages/ProfilePage';
 import RolesPage from './pages/RolesPage';
 import UsersPage from './pages/UsersPage';
 import SchoolsPage from './pages/SchoolsPage';
+import SchoolDetailsPage from './pages/SchoolDetailsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import RoleRoute from './components/RoleRoute';
@@ -56,6 +57,7 @@ function App() {
         <Route path="users" element={<RoleRoute allowedRoles={['super-admin', 'admin']}><UsersPage /></RoleRoute>} />
         <Route path="roles" element={<RoleRoute allowedRoles={['super-admin', 'admin']}><RolesPage /></RoleRoute>} />
         <Route path="schools" element={<RoleRoute allowedRoles={['super-admin']}><SchoolsPage /></RoleRoute>} />
+        <Route path="schools/:schoolId" element={<RoleRoute allowedRoles={['super-admin']}><SchoolDetailsPage /></RoleRoute>} />
         <Route path="leaves" element={<RoleRoute allowedRoles={['super-admin', 'admin']}><LeavesPage /></RoleRoute>} />
         <Route path="tc" element={<RoleRoute allowedRoles={['super-admin', 'admin']}><TransferCertificatePage /></RoleRoute>} />
         <Route path="profile" element={<RoleRoute allowedRoles={['super-admin', 'admin', 'teacher', 'student', 'parent']}><ProfilePage /></RoleRoute>} />

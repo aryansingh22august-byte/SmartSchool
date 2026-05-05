@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api';
 
 function SchoolsPage() {
+  const navigate = useNavigate();
   const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -130,10 +132,18 @@ function SchoolsPage() {
                   <p className="mt-2 text-sm text-slate-500">Created: {new Date(school.created_at).toLocaleDateString()}</p>
                 </div>
                 <div className="flex gap-3">
-                  <button className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50">
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/users?schoolId=${school.id}`)}
+                    className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+                  >
                     Manage Users
                   </button>
-                  <button className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50">
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/schools/${school.id}`)}
+                    className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+                  >
                     View Details
                   </button>
                 </div>
