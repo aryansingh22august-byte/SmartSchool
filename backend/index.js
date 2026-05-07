@@ -2,24 +2,28 @@ import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import authRouter from './src/routes/auth.js';
-import dashboardRouter from './src/routes/dashboard.js';
-import admissionsRouter from './src/routes/admissions.js';
-import feesRouter from './src/routes/fees.js';
-import timetableRouter from './src/routes/timetable.js';
-import examsRouter from './src/routes/exams.js';
-import attendanceRouter from './src/routes/attendance.js';
-import messagesRouter from './src/routes/messages.js';
-import staffRouter from './src/routes/staff.js';
-import studentsRouter from './src/routes/students.js';
-import leavesRouter from './src/routes/leaves.js';
-import tcRouter from './src/routes/tc.js';
-import profileRouter from './src/routes/profile.js';
-import rolesRouter from './src/routes/roles.js';
-import usersRouter from './src/routes/users.js';
-import contactRouter from './src/routes/contact.js';
-import schoolsRouter from './src/routes/schools.js';
-import { initDb } from './src/db.js';
+
+// Core
+import { initDb } from './src/core/db.js';
+
+// Modules
+import authRouter from './src/modules/auth/auth.routes.js';
+import dashboardRouter from './src/modules/dashboard/dashboard.routes.js';
+import admissionsRouter from './src/modules/administration/admissions.routes.js';
+import feesRouter from './src/modules/administration/fees.routes.js';
+import staffRouter from './src/modules/administration/staff.routes.js';
+import studentsRouter from './src/modules/administration/students.routes.js';
+import leavesRouter from './src/modules/administration/leaves.routes.js';
+import tcRouter from './src/modules/administration/tc.routes.js';
+import profileRouter from './src/modules/administration/profile.routes.js';
+import usersRouter from './src/modules/administration/users.routes.js';
+import rolesRouter from './src/modules/administration/roles.routes.js';
+import timetableRouter from './src/modules/academics/timetable.routes.js';
+import examsRouter from './src/modules/academics/exams.routes.js';
+import attendanceRouter from './src/modules/academics/attendance.routes.js';
+import messagesRouter from './src/modules/communication/messages.routes.js';
+import contactRouter from './src/modules/communication/contact.routes.js';
+import schoolsRouter from './src/modules/schools/schools.routes.js';
 
 dotenv.config();
 
@@ -29,7 +33,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const frontendDist = process.env.NODE_ENV === 'production' 
+const frontendDist = process.env.NODE_ENV === 'production'
   ? path.join(process.cwd(), '../frontend/dist')
   : path.resolve(process.cwd(), '../frontend/dist');
 
