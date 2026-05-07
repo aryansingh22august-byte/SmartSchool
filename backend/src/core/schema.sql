@@ -145,3 +145,73 @@ CREATE TABLE IF NOT EXISTS contact_requests (
   message TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Phase 2: Teacher & Admin Workflow Tables
+
+CREATE TABLE IF NOT EXISTS classes (
+  id TEXT PRIMARY KEY,
+  school_id TEXT REFERENCES schools(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  grade TEXT NOT NULL,
+  section TEXT NOT NULL,
+  class_teacher_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS student_attendance (
+  id TEXT PRIMARY KEY,
+  school_id TEXT REFERENCES schools(id) ON DELETE CASCADE,
+  student_id TEXT REFERENCES students(id) ON DELETE CASCADE,
+  class_id TEXT REFERENCES classes(id) ON DELETE SET NULL,
+  date DATE NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('present', 'absent', 'late')),
+  marked_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(student_id, date)
+);
+
+CREATE TABLE IF NOT EXISTS exam_marks (
+  id TEXT PRIMARY KEY,
+  school_id TEXT REFERENCES schools(id) ON DELETE CASCADE,
+  exam_id TEXT REFERENCES exams(id) ON DELETE CASCADE,
+  student_id TEXT REFERENCES students(id) ON DELETE CASCADE,
+  subject TEXT NOT NULL,
+  marks_obtained NUMERIC NOT NULL DEFAULT 0,
+  total_marks NUMERIC NOT NULL DEFAULT 100,
+  grade_letter TEXT,
+  graded_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(exam_id, student_id, subject)
+);
+
+CREATE TABLE IF NOT EXISTS fee_services (
+  id TEXT PRIMARY KEY,
+  school_id TEXT REFERENCES schools(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  description TEXT,
+  monthly_cost NUMERIC NOT NULL DEFAULT 0,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS student_fee_services (
+  id TEXT PRIMARY KEY,
+  school_id TEXT REFERENCES schools(id) ON DELETE CASCADE,
+  student_id TEXT REFERENCES students(id) ON DELETE CASCADE,
+  service_id TEXT REFERENCES fee_services(id) ON DELETE CASCADE,
+  assigned_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(student_id, service_id)
+);
+
+CREATE TABLE IF NOT EXISTS fee_payments (
+  id TEXT PRIMARY KEY,
+  school_id TEXT REFERENCES schools(id) ON DELETE CASCADE,
+  student_id TEXT REFERENCES students(id) ON DELETE CASCADE,
+  amount NUMERIC NOT NULL,
+  payment_date DATE NOT NULL,
+  payment_method TEXT DEFAULT 'cash',
+  note TEXT,
+  created_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+

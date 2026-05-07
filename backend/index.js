@@ -24,6 +24,10 @@ import attendanceRouter from './src/modules/academics/attendance.routes.js';
 import messagesRouter from './src/modules/communication/messages.routes.js';
 import contactRouter from './src/modules/communication/contact.routes.js';
 import schoolsRouter from './src/modules/schools/schools.routes.js';
+import classesRouter from './src/modules/academics/classes.routes.js';
+import studentAttendanceRouter from './src/modules/academics/student-attendance.routes.js';
+import marksRouter from './src/modules/academics/marks.routes.js';
+import feeServicesRouter from './src/modules/administration/fee-services.routes.js';
 
 dotenv.config();
 
@@ -61,6 +65,10 @@ async function start() {
   app.use('/api/users', usersRouter);
   app.use('/api/contact', contactRouter);
   app.use('/api/schools', schoolsRouter);
+  app.use('/api/classes', classesRouter);
+  app.use('/api/student-attendance', studentAttendanceRouter);
+  app.use('/api/marks', marksRouter);
+  app.use('/api/fee-services', feeServicesRouter);
 
   app.get('/', (req, res) => {
     res.send({ status: 'Smart School ERP backend is running' });
