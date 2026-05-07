@@ -287,3 +287,18 @@ CREATE TABLE IF NOT EXISTS library_issues (
   issued_by TEXT REFERENCES users(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Phase 4: Performance Indexes
+CREATE INDEX IF NOT EXISTS idx_users_school_id ON users(school_id);
+CREATE INDEX IF NOT EXISTS idx_students_school_id ON students(school_id);
+CREATE INDEX IF NOT EXISTS idx_staff_school_id ON staff(school_id);
+CREATE INDEX IF NOT EXISTS idx_fees_school_id ON fees(school_id);
+CREATE INDEX IF NOT EXISTS idx_attendance_school_id ON attendance(school_id);
+CREATE INDEX IF NOT EXISTS idx_exams_school_id ON exams(school_id);
+CREATE INDEX IF NOT EXISTS idx_student_attendance_school_id ON student_attendance(school_id);
+CREATE INDEX IF NOT EXISTS idx_exam_marks_school_id ON exam_marks(school_id);
+CREATE INDEX IF NOT EXISTS idx_fee_payments_school_id ON fee_payments(school_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_school_id ON audit_logs(school_id);
+CREATE INDEX IF NOT EXISTS idx_payroll_school_id ON payroll(school_id);
+CREATE INDEX IF NOT EXISTS idx_library_issues_school_id ON library_issues(school_id);
+

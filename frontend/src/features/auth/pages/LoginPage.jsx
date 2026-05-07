@@ -33,7 +33,7 @@ function LoginPage() {
 
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">Username</label>
+            <label className="mb-2 block text-sm font-medium text-slate-700">Username or Email</label>
             <input
               name="username"
               value={credentials.username}
