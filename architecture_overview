@@ -1,0 +1,62 @@
+# Smart School ERP: Architecture & Data Flow Overview
+
+This document outlines how the Smart School ERP platform is structured from the ground up, how data flows between the user and the database, and how access control ensures data privacy across multiple schools.
+
+## 1. High-Level Tech Stack
+- **Frontend**: React.js (Vite), Tailwind CSS, React Router v6.
+- **Backend**: Node.js, Express.js.
+- **Database**: PostgreSQL (hosted on Railway).
+- **Security**: JWT (HttpOnly Cookies), bcrypt (Password Hashing), Zod (Payload Validation).
+
+## 2. Feature-Based Modular Architecture
+Instead of grouping files by "type" (all controllers together, all models together), the project uses a **Feature-Based** structure. This means the frontend and backend mirror each other perfectly:
+
+```text
+Frontend (Features)         Backend (Modules)
+/features/auth        <---> /api/auth
+/features/dashboard   <---> /api/dashboard
+/features/academics   <---> /api/timetable, /api/exams, /api/marks
+/features/administration <---> /api/fees, /api/staff, /api/payroll
+```
+*Logic Flow:* When a user interacts with the `FeesPage.jsx` in the frontend administration feature, it makes an Axios call directly to the `fees.routes.js` inside the backend administration module.
+
+## 3. Database & Multi-Tenancy (SaaS Isolation)
+The platform is designed as a **Multi-Tenant SaaS**. This means data for *all* schools lives in the same PostgreSQL database, but is strictly isolated using a `school_id`.
+
+- Every core table (`students`, `fees`, `attendance`) has a `school_id` column linked to the main `schools` table.
+- **The Rule of Isolation:** When the backend queries the database, it *always* enforces the `school_id` from the user's secure JWT token. 
+  - *Example:* `SELECT * FROM students WHERE school_id = $1`
+  - This guarantees that "School A" can never accidentally fetch or modify "School B"s data.
+
+## 4. Authentication Flow (The "Login" Journey)
+1. **Request:** The user enters credentials on the frontend `/login`.
+2. **Validation:** The backend receives the request and validates the payload using Zod.
+3. **Verification:** The backend searches the `users` table for the email/username and uses `bcrypt.compareSync` to verify the hashed password.
+4. **Token Generation:** The backend creates a JSON Web Token (JWT) containing the user's `id`, `role`, and crucially, their `school_id`.
+5. **Secure Delivery:** Instead of sending the token as readable text, the backend wraps it in an **HttpOnly Cookie**. This cookie is saved in the user's browser, but cannot be stolen by malicious JavaScript (preventing XSS attacks).
+6. **Subsequent Requests:** For every subsequent API call, the browser automatically attaches this secure cookie. The backend `auth.js` middleware intercepts the request, verifies the cookie, and attaches the user data to `req.user` so the route knows *who* is asking for data.
+
+## 5. Role-Based Access Control (RBAC)
+The platform enforces strict authorization at two levels: the UI and the API.
+
+### Frontend Authorization (`RoleRoute.jsx`)
+The frontend uses a custom component called `<RoleRoute allowedRoles={['...']}>`. If a user tries to access a URL they don't have permission for, React intercepts the render and redirects them to an `Unauthorized` page.
+
+### Backend Authorization
+Even if a user bypasses the frontend, the backend routes check the `req.user.role` extracted from the JWT.
+
+### The Role Hierarchy
+1. **Super Admin (`super-admin`)**: 
+   - Has no specific `school_id`.
+   - Accesses the "School Accounts" dashboard to view cross-platform SaaS metrics (Revenue, Total Subscriptions).
+   - Can create new schools and school admin accounts.
+2. **School Admin (`admin`)**:
+   - Tied to a specific `school_id`.
+   - Has full CRUD (Create, Read, Update, Delete) access to their school's Administration modules (Fees, Payroll, Staff, Admissions).
+   - Views school-specific metrics on the Dashboard.
+3. **Teacher (`teacher`)**:
+   - Tied to a specific `school_id`.
+   - Can view student data, and update specific Academic tables (Attendance, Exam Marks).
+4. **Student (`student`) / Parent (`parent`)**:
+   - Tied to a specific `school_id`.
+   - Read-only access to their specific records (Timetable, Own Exam Marks).

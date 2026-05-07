@@ -63,6 +63,10 @@ router.post('/', authorizeRole('super-admin', 'admin'), async (req, res) => {
     return res.status(400).json({ message: 'Invalid role.' });
   }
 
+  if (role === 'super-admin' && req.user.role !== 'super-admin') {
+    return res.status(403).json({ message: 'Forbidden: Cannot create a super-admin user.' });
+  }
+
   if (isMock()) {
     const user = {
       id: `user-${Date.now()}`,
@@ -91,6 +95,10 @@ router.put('/:id', authorizeRole('super-admin', 'admin'), async (req, res) => {
   const roleMeta = roleDefinitions.find((entry) => entry.id === role);
   if (role && !roleMeta) {
     return res.status(400).json({ message: 'Invalid role.' });
+  }
+
+  if (role === 'super-admin' && req.user.role !== 'super-admin') {
+    return res.status(403).json({ message: 'Forbidden: Cannot assign super-admin role.' });
   }
 
   if (isMock()) {

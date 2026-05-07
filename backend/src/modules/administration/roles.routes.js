@@ -9,10 +9,15 @@ router.use(authenticate);
 
 router.get('/', authorizeRole('super-admin', 'admin'), async (req, res) => {
   if (isMock()) {
-    return res.json({ roles });
+    const filteredRoles = req.user.role === 'super-admin' ? roles : roles.filter(r => r.id !== 'super-admin');
+    return res.json({ roles: filteredRoles });
   }
 
-  const result = await query('SELECT id, name, description, permissions FROM roles ORDER BY name');
+  const queryText = req.user.role === 'super-admin' 
+    ? 'SELECT id, name, description, permissions FROM roles ORDER BY name'
+    : "SELECT id, name, description, permissions FROM roles WHERE id != 'super-admin' ORDER BY name";
+
+  const result = await query(queryText);
   res.json({ roles: result.rows });
 });
 
