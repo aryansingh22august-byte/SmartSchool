@@ -25,6 +25,10 @@ import FeesPage from '../features/administration/pages/FeesPage';
 import StaffPage from '../features/administration/pages/StaffPage';
 import LeavesPage from '../features/administration/pages/LeavesPage';
 import TransferCertificatePage from '../features/administration/pages/TransferCertificatePage';
+import AuditLogsPage from '../features/administration/pages/AuditLogsPage';
+import PayrollPage from '../features/administration/pages/PayrollPage';
+import LibraryPage from '../features/administration/pages/LibraryPage';
+import DataExportPage from '../features/administration/pages/DataExportPage';
 
 // Communication
 import MessagesPage from '../features/communication/pages/MessagesPage';
@@ -77,6 +81,10 @@ function App() {
         <Route path="leaves" element={<RoleRoute allowedRoles={['super-admin', 'admin']}><LeavesPage /></RoleRoute>} />
         <Route path="tc" element={<RoleRoute allowedRoles={['super-admin', 'admin']}><TransferCertificatePage /></RoleRoute>} />
         <Route path="profile" element={<RoleRoute allowedRoles={['super-admin', 'admin', 'teacher', 'student', 'parent']}><ProfilePage /></RoleRoute>} />
+        <Route path="audit-logs" element={<RoleRoute allowedRoles={['super-admin', 'admin']}><AuditLogsPage /></RoleRoute>} />
+        <Route path="payroll" element={<RoleRoute allowedRoles={['super-admin', 'admin']}><PayrollPage /></RoleRoute>} />
+        <Route path="library" element={<RoleRoute allowedRoles={['super-admin', 'admin', 'teacher', 'student', 'parent']}><LibraryPage /></RoleRoute>} />
+        <Route path="data-export" element={<RoleRoute allowedRoles={['super-admin', 'admin']}><DataExportPage /></RoleRoute>} />
         <Route path="unauthorized" element={<UnauthorizedPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

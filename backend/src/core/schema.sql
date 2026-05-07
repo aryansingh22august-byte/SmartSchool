@@ -215,3 +215,75 @@ CREATE TABLE IF NOT EXISTS fee_payments (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Phase 3: Reliability, Audit & Extended Modules
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+  id TEXT PRIMARY KEY,
+  school_id TEXT REFERENCES schools(id) ON DELETE CASCADE,
+  user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  user_name TEXT,
+  action TEXT NOT NULL,
+  entity TEXT NOT NULL,
+  entity_id TEXT,
+  old_value JSONB,
+  new_value JSONB,
+  ip_address TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS staff_attendance (
+  id TEXT PRIMARY KEY,
+  school_id TEXT REFERENCES schools(id) ON DELETE CASCADE,
+  staff_id TEXT REFERENCES staff(id) ON DELETE CASCADE,
+  date DATE NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('present', 'absent', 'half-day', 'on-leave')),
+  marked_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(staff_id, date)
+);
+
+CREATE TABLE IF NOT EXISTS payroll (
+  id TEXT PRIMARY KEY,
+  school_id TEXT REFERENCES schools(id) ON DELETE CASCADE,
+  staff_id TEXT REFERENCES staff(id) ON DELETE CASCADE,
+  month TEXT NOT NULL,
+  year INTEGER NOT NULL,
+  base_salary NUMERIC NOT NULL DEFAULT 0,
+  present_days INTEGER NOT NULL DEFAULT 0,
+  total_working_days INTEGER NOT NULL DEFAULT 26,
+  deductions NUMERIC NOT NULL DEFAULT 0,
+  bonuses NUMERIC NOT NULL DEFAULT 0,
+  net_salary NUMERIC GENERATED ALWAYS AS (ROUND((base_salary / total_working_days) * present_days + bonuses - deductions, 2)) STORED,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'paid')),
+  paid_on DATE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(staff_id, month, year)
+);
+
+CREATE TABLE IF NOT EXISTS library_books (
+  id TEXT PRIMARY KEY,
+  school_id TEXT REFERENCES schools(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  author TEXT NOT NULL,
+  isbn TEXT,
+  category TEXT,
+  total_copies INTEGER NOT NULL DEFAULT 1,
+  available_copies INTEGER NOT NULL DEFAULT 1,
+  added_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS library_issues (
+  id TEXT PRIMARY KEY,
+  school_id TEXT REFERENCES schools(id) ON DELETE CASCADE,
+  book_id TEXT REFERENCES library_books(id) ON DELETE CASCADE,
+  borrower_id TEXT NOT NULL,
+  borrower_type TEXT NOT NULL CHECK (borrower_type IN ('student', 'staff')),
+  borrower_name TEXT NOT NULL,
+  issued_on DATE NOT NULL DEFAULT CURRENT_DATE,
+  due_date DATE NOT NULL,
+  returned_on DATE,
+  status TEXT NOT NULL DEFAULT 'issued' CHECK (status IN ('issued', 'returned', 'overdue')),
+  issued_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);

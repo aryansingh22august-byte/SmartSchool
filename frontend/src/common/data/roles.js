@@ -41,5 +41,9 @@ export const NAV_ITEMS = [
   { path: '/roles', label: 'Roles', roles: ['super-admin', 'admin'] },
   { path: '/leaves', label: 'Leaves', roles: ['super-admin', 'admin'] },
   { path: '/tc', label: 'TC', roles: ['super-admin', 'admin'] },
+  { path: '/library', label: 'Library', roles: ['super-admin', 'admin', 'teacher', 'student', 'parent'] },
+  { path: '/payroll', label: 'Payroll & HR', roles: ['super-admin', 'admin'] },
+  { path: '/audit-logs', label: 'Audit Logs', roles: ['super-admin', 'admin'] },
+  { path: '/data-export', label: 'Data Export', roles: ['super-admin', 'admin'] },
   { path: '/profile', label: 'Profile', roles: ['super-admin', 'admin', 'teacher', 'student', 'parent'] }
 ];
