@@ -39,8 +39,23 @@ export const fees = [
 ];
 
 export const timetable = [
-  { day: 'Monday', subject: 'Math', teacher: 'Mr. Verma', time: '09:00 - 10:00' },
-  { day: 'Monday', subject: 'Science', teacher: 'Ms. Khan', time: '10:15 - 11:15' }
+  // Monday
+  { id: 'T1', day: 'MON', subject: 'Physics', type: 'Lab', room: 'Lab 04', teacher: 'Dr. Elara Vance', time: '09:00 - 10:00', color: 'bg-pink-100 text-pink-800 border-pink-200' },
+  { id: 'T2', day: 'MON', subject: 'Math', type: 'Core', room: 'R 101', teacher: 'Mr. R. Verma', time: '10:00 - 11:00', color: 'bg-amber-100 text-amber-800 border-amber-200' },
+  { id: 'T3', day: 'MON', subject: 'Cyber', type: 'Elective', room: 'R 202', teacher: 'Sarah Connor', time: '11:30 - 12:30', color: 'bg-teal-100 text-teal-800 border-teal-200' },
+  // Tuesday
+  { id: 'T4', day: 'TUE', subject: 'Cyber', type: 'Elective', room: 'R 202', teacher: 'Sarah Connor', time: '09:00 - 10:00', color: 'bg-teal-100 text-teal-800 border-teal-200' },
+  { id: 'T5', day: 'TUE', subject: 'Physics', type: 'Lab', room: 'Lab 04', teacher: 'Dr. Elara Vance', time: '10:00 - 11:00', color: 'bg-pink-100 text-pink-800 border-pink-200' },
+  { id: 'T6', day: 'TUE', subject: 'Math', type: 'Core', room: 'R 101', teacher: 'Mr. R. Verma', time: '11:30 - 12:30', color: 'bg-amber-100 text-amber-800 border-amber-200' },
+  // Wednesday
+  { id: 'T7', day: 'WED', subject: 'Physics', type: 'Lab', room: 'Lab 04', teacher: 'Dr. Elara Vance', time: '09:00 - 10:00', color: 'bg-pink-100 text-pink-800 border-pink-200' },
+  { id: 'T8', day: 'WED', subject: 'Library', type: 'Core', room: 'Lib 01', teacher: 'Ms. Khan', time: '10:00 - 11:00', color: 'bg-slate-100 text-slate-800 border-slate-200' },
+  // Thursday
+  { id: 'T9', day: 'THU', subject: 'Cyber', type: 'Elective', room: 'R 202', teacher: 'Sarah Connor', time: '10:00 - 11:00', color: 'bg-teal-100 text-teal-800 border-teal-200' },
+  { id: 'T10', day: 'THU', subject: 'Physics', type: 'Lab', room: 'Lab 04', teacher: 'Dr. Elara Vance', time: '11:30 - 12:30', color: 'bg-pink-100 text-pink-800 border-pink-200' },
+  // Friday
+  { id: 'T11', day: 'FRI', subject: 'Math', type: 'Core', room: 'R 101', teacher: 'Mr. R. Verma', time: '09:00 - 10:00', color: 'bg-amber-100 text-amber-800 border-amber-200' },
+  { id: 'T12', day: 'FRI', subject: 'Physics', type: 'Lab', room: 'Lab 04', teacher: 'Dr. Elara Vance', time: '11:30 - 12:30', color: 'bg-pink-100 text-pink-800 border-pink-200' }
 ];
 
 export const exams = [
