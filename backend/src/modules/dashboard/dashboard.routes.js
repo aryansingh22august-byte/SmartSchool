@@ -75,18 +75,17 @@ router.get('/', async (req, res) => {
     });
   }
 
-  const schoolFilter = 'WHERE school_id = $1';
   const metrics = [
-    { label: 'Total Students', sql: 'SELECT COUNT(*) AS count FROM students' },
-    { label: 'Total Staff', sql: 'SELECT COUNT(*) AS count FROM staff' },
-    { label: 'Today Attendance', sql: "SELECT percentage FROM attendance ORDER BY date DESC LIMIT 1" },
-    { label: 'Fees Collected', sql: 'SELECT COALESCE(SUM(paid), 0) AS amount FROM fees' }
+    { label: 'Total Students', sql: 'SELECT COUNT(*) AS count FROM students WHERE school_id = $1' },
+    { label: 'Total Staff', sql: 'SELECT COUNT(*) AS count FROM staff WHERE school_id = $1' },
+    { label: 'Today Attendance', sql: "SELECT percentage FROM attendance WHERE school_id = $1 ORDER BY date DESC LIMIT 1" },
+    { label: 'Fees Collected', sql: 'SELECT COALESCE(SUM(paid), 0) AS amount FROM fees WHERE school_id = $1' }
   ];
 
   const rows = await Promise.all(
     metrics.map(async (metric) => {
-      const resObj = await query(`${metric.sql} ${schoolFilter}`, [req.user.school_id]);
-      const value = metric.label === 'Fees Collected' ? `$${resObj.rows[0].amount}` : metric.label === 'Today Attendance' ? `${resObj.rows[0]?.percentage || '0%'} ` : `${resObj.rows[0]?.count || 0}`;
+      const resObj = await query(metric.sql, [req.user.school_id]);
+      const value = metric.label === 'Fees Collected' ? `$${resObj.rows[0]?.amount || 0}` : metric.label === 'Today Attendance' ? `${resObj.rows[0]?.percentage || '0%'}` : `${resObj.rows[0]?.count || 0}`;
       return {
         label: metric.label,
         value,
