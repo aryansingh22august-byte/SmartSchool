@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Inter, system-ui, sans-serif;
+@layer base {
+  body {
+    font-family: 'Sora', 'Inter', system-ui, sans-serif;
+    background-color: #f8fafc;
+  }
+}
+
+@layer components {
+  .minimal-input {
+    @apply w-full bg-transparent border-0 border-b-2 border-slate-200 px-0 py-2 text-sm focus:border-slate-800 focus:ring-0 focus:outline-none transition-colors duration-200;
+  }
+  
+  .table-header {
+    @apply px-4 py-4 text-xs font-bold uppercase tracking-[0.15em] text-slate-500 border-b border-slate-100;
+  }
+
+  .floating-action-button {
+    @apply rounded-full bg-slate-900 text-white shadow-lg hover:bg-slate-800 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center;
+  }
 }

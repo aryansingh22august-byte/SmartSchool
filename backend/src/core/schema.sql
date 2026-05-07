@@ -43,6 +43,12 @@ CREATE TABLE IF NOT EXISTS students (
   grade TEXT NOT NULL,
   section TEXT NOT NULL,
   status TEXT NOT NULL,
+  roll_number TEXT,
+  date_of_birth DATE,
+  gender TEXT,
+  guardian_name TEXT,
+  contact_number TEXT,
+  address TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -62,6 +68,9 @@ CREATE TABLE IF NOT EXISTS admissions (
   grade TEXT NOT NULL,
   status TEXT NOT NULL,
   admission_date DATE NOT NULL,
+  previous_school TEXT,
+  parent_email TEXT,
+  parent_phone TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

@@ -48,7 +48,24 @@ async function runMigrations() {
     const schemaPath = path.resolve(process.cwd(), 'src', 'core', 'schema.sql');
     const sql = fs.readFileSync(schemaPath, 'utf8');
     await pool.query(sql);
-    console.log('Database schema ensured.');
+
+    // Apply safe column additions to support the Phase 2 UI expansion
+    const alterQueries = [
+      'ALTER TABLE students ADD COLUMN IF NOT EXISTS roll_number TEXT;',
+      'ALTER TABLE students ADD COLUMN IF NOT EXISTS date_of_birth DATE;',
+      'ALTER TABLE students ADD COLUMN IF NOT EXISTS gender TEXT;',
+      'ALTER TABLE students ADD COLUMN IF NOT EXISTS guardian_name TEXT;',
+      'ALTER TABLE students ADD COLUMN IF NOT EXISTS contact_number TEXT;',
+      'ALTER TABLE students ADD COLUMN IF NOT EXISTS address TEXT;',
+      'ALTER TABLE admissions ADD COLUMN IF NOT EXISTS previous_school TEXT;',
+      'ALTER TABLE admissions ADD COLUMN IF NOT EXISTS parent_email TEXT;',
+      'ALTER TABLE admissions ADD COLUMN IF NOT EXISTS parent_phone TEXT;'
+    ];
+    for (const q of alterQueries) {
+      await pool.query(q);
+    }
+    
+    console.log('Database schema and migrations ensured.');
   } catch (error) {
     console.error('Failed to run migrations:', error);
     throw error;
