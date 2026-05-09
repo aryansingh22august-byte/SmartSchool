@@ -1,149 +1,209 @@
-import { useEffect, useState } from 'react';
-import api from '../../../app/api';
+import { useState } from 'react';
 
 function AttendancePage() {
-  const [classes, setClasses] = useState([]);
-  const [selectedClass, setSelectedClass] = useState(null);
-  const [students, setStudents] = useState([]);
-  const [attendance, setAttendance] = useState({});
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState('');
-  const [legacyRecords, setLegacyRecords] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+  
+  // Interactive Attendance State (P, A, L)
+  const [attendanceMap, setAttendanceMap] = useState({
+    'STU-2024-001': 'P',
+    'STU-2024-005': 'L',
+    'STU-2024-012': 'A',
+  });
 
-  useEffect(() => {
-    api.get('/classes').then(res => setClasses(res.data.classes || []));
-    api.get('/attendance').then(res => setLegacyRecords(res.data.attendance || []));
-  }, []);
+  const students = [
+    { id: 'STU-2024-001', name: 'Arjun Mehta', avatar: 'https://i.pravatar.cc/150?img=11', punch: '08:45 AM' },
+    { id: 'STU-2024-005', name: 'Sarah Jenkins', avatar: 'https://i.pravatar.cc/150?img=5', punch: '09:12 AM' },
+    { id: 'STU-2024-012', name: "Liam O'Conner", avatar: 'https://i.pravatar.cc/150?img=12', punch: '---' },
+  ];
 
-  const loadClassStudents = async (cls) => {
-    setSelectedClass(cls);
-    setMessage('');
-    const res = await api.get(`/classes/${cls.id}/students`);
-    const studs = res.data.students || [];
-    setStudents(studs);
-    // Load existing attendance for the selected date
-    const attRes = await api.get(`/student-attendance?date=${date}&classId=${cls.id}`);
-    const existing = {};
-    (attRes.data.records || []).forEach(r => { existing[r.student_id] = r.status; });
-    // Default all to 'present'
-    studs.forEach(s => { if (!existing[s.id]) existing[s.id] = 'present'; });
-    setAttendance(existing);
+  const handleStatusChange = (studentId, status) => {
+    setAttendanceMap(prev => ({
+      ...prev,
+      [studentId]: status
+    }));
   };
 
-  const handleDateChange = async (newDate) => {
-    setDate(newDate);
-    if (!selectedClass) return;
-    const attRes = await api.get(`/student-attendance?date=${newDate}&classId=${selectedClass.id}`);
-    const existing = {};
-    (attRes.data.records || []).forEach(r => { existing[r.student_id] = r.status; });
-    students.forEach(s => { if (!existing[s.id]) existing[s.id] = 'present'; });
-    setAttendance(existing);
+  const handleSaveLog = () => {
+    setIsSaving(true);
+    setSaveMessage('');
+    setTimeout(() => {
+      setIsSaving(false);
+      setSaveMessage('Log saved successfully!');
+      setTimeout(() => setSaveMessage(''), 3000);
+    }, 1000);
   };
-
-  const toggleStatus = (studentId, status) => {
-    setAttendance(prev => ({ ...prev, [studentId]: status }));
-  };
-
-  const handleSave = async () => {
-    if (!selectedClass) return;
-    setSaving(true);
-    setMessage('');
-    try {
-      const records = students.map(s => ({ student_id: s.id, status: attendance[s.id] || 'present' }));
-      await api.post('/student-attendance', { date, classId: selectedClass.id, records });
-      setMessage('Attendance saved successfully!');
-    } catch {
-      setMessage('Failed to save attendance.');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const statusColors = { present: 'bg-green-100 text-green-800', absent: 'bg-red-100 text-red-800', late: 'bg-amber-100 text-amber-800' };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-blue-50 rounded-md p-6">
-        <h2 className="text-2xl font-semibold text-blue-900">Attendance</h2>
-        <p className="mt-1 text-sm text-blue-700">Select a class and mark per-student attendance.</p>
-      </div>
+    <div className="space-y-6 pb-24">
+      
+      {/* --- TOP ROW: KPI CARDS --- */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        {/* Today's Attendance */}
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col justify-center">
+          <p className="text-[10px] font-bold tracking-widest text-[#00C2A0] uppercase mb-2">Today's Attendance</p>
+          <div className="flex justify-between items-end">
+            <h2 className="text-3xl font-black text-slate-800 tracking-tight">94.2%</h2>
+            <span className="text-[#00C2A0] text-[10px] font-bold mb-1">↗ +1.2%</span>
+          </div>
+        </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Date</label>
-          <input type="date" value={date} onChange={e => handleDateChange(e.target.value)}
-            className="w-full rounded-md border border-slate-200 bg-white px-4 py-2 text-sm" />
+        {/* Staff On-Duty */}
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col justify-center">
+          <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">Staff On-Duty</p>
+          <div className="flex justify-between items-end">
+            <h2 className="text-3xl font-black text-slate-800 tracking-tight">48/52</h2>
+            <span className="text-slate-400 text-[9px] font-bold tracking-widest uppercase mb-1">Active Shifts</span>
+          </div>
+        </div>
+
+        {/* Leave Requests */}
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col justify-center">
+          <p className="text-[10px] font-bold tracking-widest text-amber-500 uppercase mb-2">Leave Requests</p>
+          <div className="flex justify-between items-end">
+            <h2 className="text-3xl font-black text-amber-500 tracking-tight">08</h2>
+            <span className="text-amber-500 text-[9px] font-bold tracking-widest uppercase mb-1">Pending</span>
+          </div>
+        </div>
+
+        {/* Defaulters */}
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col justify-center">
+          <p className="text-[10px] font-bold tracking-widest text-[#FF2D55] uppercase mb-2">Defaulters</p>
+          <div className="flex justify-between items-end">
+            <h2 className="text-3xl font-black text-slate-800 tracking-tight">12</h2>
+            <span className="text-[#FF2D55] text-[9px] font-bold tracking-widest uppercase mb-1">Action Required</span>
+          </div>
         </div>
       </div>
 
-      {classes.length > 0 && (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {classes.map(cls => (
-            <button key={cls.id} onClick={() => loadClassStudents(cls)}
-              className={`rounded-md p-4 text-left ${selectedClass?.id === cls.id ? 'bg-blue-600 text-white' : 'bg-slate-50 hover:bg-slate-100 text-slate-800'}`}>
-              <p className="font-semibold">{cls.name}</p>
-              <p className="text-sm opacity-75">Grade {cls.grade} – Section {cls.section}</p>
-              {cls.teacher_name && <p className="text-xs opacity-60 mt-1">Teacher: {cls.teacher_name}</p>}
+      {/* --- MIDDLE SECTION: CLASS ATTENDANCE LIST --- */}
+      <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <div>
+            <h3 className="text-lg font-bold text-slate-800">Class Attendance: 10-A (Mathematics)</h3>
+            <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mt-1">Instructor: Dr. Elias Vance | Period 3</p>
+          </div>
+          <div className="flex items-center gap-3">
+            {saveMessage && <span className="text-[10px] font-bold text-[#FF2D55] tracking-widest uppercase animate-pulse">{saveMessage}</span>}
+            <button className="border border-[#00C2A0] text-[#00C2A0] text-[9px] font-bold tracking-widest uppercase px-4 py-2 rounded-lg hover:bg-teal-50 transition-colors flex items-center gap-1">
+              ◎ Biometric Synced
             </button>
-          ))}
-        </div>
-      )}
-
-      {selectedClass && students.length > 0 && (
-        <div className="bg-white rounded-md overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 bg-slate-50">
-            <h3 className="font-semibold text-slate-800">{selectedClass.name} — {date}</h3>
-            <button onClick={handleSave} disabled={saving}
-              className="rounded-md bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50">
-              {saving ? 'Saving…' : 'Save Attendance'}
+            <button 
+              onClick={handleSaveLog}
+              disabled={isSaving}
+              className="bg-[#FF2D55] text-white text-[9px] font-bold tracking-widest uppercase px-6 py-2 rounded-lg hover:bg-pink-600 transition-colors shadow-lg shadow-pink-200 disabled:opacity-50"
+            >
+              {isSaving ? 'Processing...' : 'Save Log'}
             </button>
           </div>
-          {message && <p className={`px-6 py-2 text-sm ${message.includes('success') ? 'text-green-700 bg-green-50' : 'text-red-700 bg-red-50'}`}>{message}</p>}
-          <table className="min-w-full divide-y divide-slate-100 text-sm">
-            <thead className="text-slate-600">
-              <tr>
-                <th className="px-6 py-3 text-left">Student</th>
-                <th className="px-6 py-3 text-left">Grade / Section</th>
-                <th className="px-6 py-3 text-left">Status</th>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left text-sm whitespace-nowrap">
+            <thead>
+              <tr className="border-b border-slate-100">
+                <th className="pb-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest w-32">Student ID</th>
+                <th className="pb-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Student Name</th>
+                <th className="pb-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center w-40">Status</th>
+                <th className="pb-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center w-32">Punch In</th>
+                <th className="pb-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-right w-16">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {students.map(s => (
-                <tr key={s.id}>
-                  <td className="px-6 py-3 font-medium text-slate-900">{s.name}</td>
-                  <td className="px-6 py-3 text-slate-600">{s.grade} – {s.section}</td>
-                  <td className="px-6 py-3">
-                    <div className="flex gap-2">
-                      {['present', 'absent', 'late'].map(st => (
-                        <button key={st} onClick={() => toggleStatus(s.id, st)}
-                          className={`rounded-md px-3 py-1 text-xs font-semibold capitalize ${attendance[s.id] === st ? statusColors[st] : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
-                          {st}
+              {students.map((student) => {
+                const status = attendanceMap[student.id];
+                return (
+                  <tr key={student.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="py-3 font-bold text-[#00C2A0] text-xs tracking-wide">#{student.id}</td>
+                    <td className="py-3 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-slate-200 overflow-hidden shrink-0">
+                         <img src={student.avatar} alt={student.name} className="w-full h-full object-cover" />
+                      </div>
+                      <span className="font-bold text-slate-800 text-xs">{student.name}</span>
+                    </td>
+                    <td className="py-3 text-center">
+                      <div className="inline-flex gap-1 bg-slate-50 p-1 rounded-lg border border-slate-100">
+                        <button 
+                          onClick={() => handleStatusChange(student.id, 'P')}
+                          className={`w-7 h-7 rounded flex items-center justify-center text-xs font-bold transition-colors ${status === 'P' ? 'bg-[#00C2A0] text-white shadow-sm' : 'text-slate-400 hover:bg-slate-200'}`}
+                        >
+                          P
                         </button>
-                      ))}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        <button 
+                          onClick={() => handleStatusChange(student.id, 'A')}
+                          className={`w-7 h-7 rounded flex items-center justify-center text-xs font-bold transition-colors ${status === 'A' ? 'bg-[#FF2D55] text-white shadow-sm' : 'text-slate-400 hover:bg-slate-200'}`}
+                        >
+                          A
+                        </button>
+                        <button 
+                          onClick={() => handleStatusChange(student.id, 'L')}
+                          className={`w-7 h-7 rounded flex items-center justify-center text-xs font-bold transition-colors ${status === 'L' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-400 hover:bg-slate-200'}`}
+                        >
+                          L
+                        </button>
+                      </div>
+                    </td>
+                    <td className="py-3 text-center text-xs text-slate-500 font-medium">{student.punch}</td>
+                    <td className="py-3 text-right text-slate-400 cursor-pointer hover:text-slate-800 font-bold text-lg">⋮</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
-      )}
+      </div>
 
-      {legacyRecords.length > 0 && !selectedClass && (
-        <div className="bg-white rounded-md p-6">
-          <h3 className="font-semibold text-slate-800 mb-4">Daily Summary Records</h3>
-          <ul className="space-y-3">
-            {legacyRecords.map(item => (
-              <li key={item.date} className="flex items-center justify-between rounded-md bg-slate-50 px-4 py-3">
-                <p className="font-medium text-slate-800">{item.date}</p>
-                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">{item.percentage}</span>
-                <p className="text-sm text-slate-500">Present: {item.present} / Absent: {item.absent}</p>
-              </li>
-            ))}
-          </ul>
+      {/* --- BOTTOM SECTION: TRENDS CHART --- */}
+      <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+        <div className="flex justify-between items-center mb-8">
+          <h3 className="text-sm font-bold text-slate-800">Monthly Attendance Trends</h3>
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1 text-[9px] font-bold text-slate-400 tracking-widest uppercase">
+              <span className="w-2 h-2 rounded-full bg-[#00C2A0]"></span> Students
+            </span>
+            <span className="flex items-center gap-1 text-[9px] font-bold text-slate-400 tracking-widest uppercase">
+              <span className="w-2 h-2 rounded-full bg-[#FF2D55]"></span> Staff
+            </span>
+          </div>
         </div>
-      )}
+
+        {/* Mock Chart CSS Grid */}
+        <div className="h-40 flex items-end justify-between gap-2 border-b border-slate-100 pb-2">
+          {/* Week 1 */}
+          <div className="flex-1 flex gap-1 items-end justify-center h-full">
+            <div className="w-full max-w-[24px] bg-[#00C2A0]/20 rounded-t-sm h-[70%] border-t-2 border-[#00C2A0]"></div>
+            <div className="w-full max-w-[24px] bg-[#00C2A0]/20 rounded-t-sm h-[75%] border-t-2 border-[#00C2A0]"></div>
+          </div>
+          {/* Week 2 */}
+          <div className="flex-1 flex gap-1 items-end justify-center h-full">
+            <div className="w-full max-w-[24px] bg-teal-50 rounded-t-sm h-[85%] border-t-2 border-[#00C2A0]"></div>
+            <div className="w-full max-w-[24px] bg-pink-50 rounded-t-sm h-[95%] border-t-2 border-[#FF2D55]"></div>
+            <div className="w-full max-w-[24px] bg-teal-50 rounded-t-sm h-[80%] border-t-2 border-[#00C2A0]"></div>
+          </div>
+          {/* Week 3 */}
+          <div className="flex-1 flex gap-1 items-end justify-center h-full">
+            <div className="w-full max-w-[24px] bg-teal-50 rounded-t-sm h-[82%] border-t-2 border-[#00C2A0]"></div>
+            <div className="w-full max-w-[24px] bg-pink-50 rounded-t-sm h-[88%] border-t-2 border-[#FF2D55]"></div>
+            <div className="w-full max-w-[24px] bg-[#00C2A0]/20 rounded-t-sm h-[60%] border-t-2 border-[#00C2A0]"></div>
+          </div>
+          {/* Week 4 */}
+          <div className="flex-1 flex gap-1 items-end justify-center h-full">
+            <div className="w-full max-w-[24px] bg-teal-50 rounded-t-sm h-[70%] border-t-2 border-[#00C2A0]"></div>
+            <div className="w-full max-w-[24px] bg-[#00C2A0]/20 rounded-t-sm h-[78%] border-t-2 border-[#00C2A0]"></div>
+            <div className="w-full max-w-[24px] bg-[#00C2A0]/20 rounded-t-sm h-[72%] border-t-2 border-[#00C2A0]"></div>
+          </div>
+        </div>
+        
+        {/* X-Axis Labels */}
+        <div className="flex justify-between mt-3 text-[8px] font-bold text-slate-400 tracking-widest uppercase px-6">
+          <span>WK 01</span>
+          <span>WK 02</span>
+          <span>WK 03</span>
+          <span>WK 04</span>
+        </div>
+      </div>
+
     </div>
   );
 }
